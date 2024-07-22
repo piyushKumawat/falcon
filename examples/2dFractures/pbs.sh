@@ -9,6 +9,6 @@ cd $PBS_O_WORKDIR
 
 module load use.moose moose-dev
 
-mpiexec /home/mundlb/projects_sawtooth/falcon/falcon-opt -i 2dFrac_1fluid.i > log.txt 
+mpiexec /home/kumap/sawtooth2/projects/falcon/falcon-opt -i /home/kumap/sawtooth2/projects/falcon/examples/2dFractures/2dFrac_1fluid.i
 
 
