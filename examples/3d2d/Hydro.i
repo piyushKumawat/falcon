@@ -268,7 +268,7 @@ injection_rate = 10 #kg/s
     variable = porepressure
   []
   [pmin_ts]
-    type = Extremum
+    type = NodalExtremeValue
     variable = porepressure
     vtp_output = true
   []
@@ -299,3 +299,4 @@ injection_rate = 10 #kg/s
   csv = true
   #max_output_frequency = 5000
 []
+

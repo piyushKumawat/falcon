@@ -121,11 +121,11 @@ injection_rate = 10 #kg/s
   [true_water]
     type = Water97FluidProperties
   []
-  [tabulated_water]
-    type = TabulatedFluidProperties
-    fp = true_water
-    fluid_property_file = tabulated_fluid_properties_v2.csv
-  []
+  # [tabulated_water]
+  #   type = TabulatedFluidProperties
+  #   fp = true_water
+  #   fluid_property_file = tabulated_fluid_properties_v2.csv
+  # []
 []
 
 ##############################################################
