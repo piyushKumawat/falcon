@@ -1,11 +1,12 @@
 # Units K,m,Pa,Kg,s
 # Cold water injection into one side of the fracture network, and production from the other side
 frac_permeability = 1e-12 #changed it to from e-12
-injection_rate_a = 5 # kg/s
-injection_rate_b = 5 # kg/s
+injection_rate_a = 10 # kg/s
+injection_rate_b = 10 # kg/s
 injection_temp = 323
-endTime = 32e7  # 462 days
+endTime = 63e6  # 462 days
 dt_max = 20000
+
 
 #injection points
 p1inx = 4.046160e+02
