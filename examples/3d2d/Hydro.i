@@ -4,6 +4,7 @@ frac_permeability = 1e-12
 endTime = 40e6  # 462 days
 dt_max = 10000 # NOTE, Lynn had 50000, but i want to check convergence for more agressive cases
 dt_max2 = 50000 # this is the timestep size after 90 days
+# injection_temp = 323.15
 injection_rate = 10 #kg/s
 
 # NOTES FROM LYNN
@@ -119,11 +120,11 @@ injection_rate = 10 #kg/s
   [true_water]
     type = Water97FluidProperties
   []
-  [tabulated_water]
-    type = TabulatedFluidProperties
-    fp = true_water
-    fluid_property_file = tabulated_fluid_properties_v2.csv
-  []
+  # [tabulated_water]
+  #   type = TabulatedFluidProperties
+  #   fp = true_water
+  #   fluid_property_file = tabulated_fluid_properties_v2.csv
+  # []
 []
 
 ##############################################################
@@ -141,9 +142,10 @@ injection_rate = 10 #kg/s
 []
 ##############################################################
 [BCs]
-# NOTE: these BCs prevent water from exiting or entering the model
-# from its sides, while providing water from the model top and bottom
+# NOTE: these BCs prevent water and heat from exiting or entering the model
+# from its sides, while providing water and heat from the model top and bottom
 # boundaries to ensure those boundaries remain at insitu pressure
+# and temperature
   [porepressure_top]
     type = FunctionDirichletBC
     variable = porepressure
@@ -201,6 +203,8 @@ injection_rate = 10 #kg/s
     0    0.0
     50000 ${injection_rate}'
   []
+# NOTE: because this is used in BCs, it should be reasonably physically correct,
+# otherwise the BCs will be withdrawing or injecting heat-energy inappropriately
   [insitu_pp]
     type = ParsedFunction
     value = '1.6025e7-8500*(z-1150)' # NOTE: because this is used in BCs, it should be reasonably physically correct, otherwise the BCs will be withdrawing or injecting water inappropriately.  Note also that the 8500 should be the unit_weight in the PeacemanBoreholes
@@ -245,22 +249,22 @@ injection_rate = 10 #kg/s
   [p_in]
     type = PointValue
     point = '404.616 258.1823 221.3399'
-    variable = porepressure 
+    variable =porepressure 
   []
   [p_out1]
     type = PointValue
     point = '3.879982e+02 2.567783e+02 3.034653e+02'
-    variable = porepressure 
+    variable =porepressure 
   []
   [p_out2]
     type = PointValue
     point = '3.775368e+02 2.558945e+02 3.079509e+02'
-    variable = porepressure
+    variable =porepressure
   []
   [p_out3]
     type = PointValue
     point = '3.250460e+02 2.514597e+02 3.304578e+02'
-    variable = porepressure
+    variable =porepressure
   []
   [p_out4]
     type = PointValue
@@ -270,33 +274,166 @@ injection_rate = 10 #kg/s
   [pmin_ts]
     type = NodalExtremeValue
     variable = porepressure
-    vtp_output = true
+    value_type = min
   []
-  [output_mass]
-    type = PorousFlowQuantity
+  [pmax_ts]
+    type = NodalExtremeValue
     variable = porepressure
-    SumQuantityUO = borehole_fluid_outflow_mass
+    value_type = max
   []
+  [mass_flux_src]
+      type = FunctionValuePostprocessor
+      function = mass_flux_in
+      execute_on = 'initial timestep_end'
+  []
+  [fluid_report]
+    type = PorousFlowPlotQuantity
+    uo = borehole_fluid_outflow_mass
+  []
+  [a1_nl_its]
+    type = NumNonlinearIterations
+  []
+  [a1_l_its]
+    type = NumLinearIterations
+  []
+  [a1_dt]
+    type = TimestepSize
+  []
+  [a0_wall_time]
+    type = PerfGraphData
+    section_name = "Root"
+    data_type = total
+  []
+  [a2_total_mem]
+    type = MemoryUsage
+    execute_on = 'INITIAL TIMESTEP_END'
+  []
+  [a2_per_proc_mem]
+    type = MemoryUsage
+    value_type = "average"
+    execute_on = 'INITIAL TIMESTEP_END'
+  []
+  [a2_max_proc_mem]
+    type = MemoryUsage
+    value_type = "max_process"
+    execute_on = 'INITIAL TIMESTEP_END'
+  []
+  [a3_n_elements]
+    type = NumElems
+    execute_on = timestep_end
+  []
+  [a3_n_nodes]
+    type = NumNodes
+    execute_on = timestep_end
+  []
+  [a3_DOFs]
+    type = NumDOFs
+  []
+[]
+###########################################################
+[Preconditioning]
+  active = hypre # NOTE - perhaps ilu is going to be necessary in the full problem?
+  # NOTE: the following is how i would use hypre - probably worth an experiment on the full problem
+    [./hypre]
+      type = SMP
+      full = true
+      petsc_options = '-ksp_diagonal_scale -ksp_diagonal_scale_fix'
+      petsc_options_iname = '-pc_type -pc_hypre_type'
+      petsc_options_value = ' hypre    boomeramg'
+    [../]
+    [./asm_ilu]  #uses less memory
+      type = SMP
+      full = true
+      petsc_options = '-ksp_diagonal_scale -ksp_diagonal_scale_fix'
+      petsc_options_iname = '-ksp_type -ksp_grmres_restart -pc_type -sub_pc_type -sub_pc_factor_shift_type -pc_asm_overlap'
+      petsc_options_value = 'gmres 30 asm ilu NONZERO 2'
+    [../]
+    [./asm_lu]  #uses less memory
+      type = SMP
+      full = true
+      petsc_options = '-ksp_diagonal_scale -ksp_diagonal_scale_fix'
+      petsc_options_iname = '-ksp_type -ksp_grmres_restart -pc_type -sub_pc_type -sub_pc_factor_shift_type -pc_asm_overlap'
+      petsc_options_value = 'gmres 30 asm lu NONZERO 2'
+    [../]
+    [./superlu]
+      type = SMP
+      full = true
+      petsc_options = '-ksp_diagonal_scale -ksp_diagonal_scale_fix'
+      petsc_options_iname = '-ksp_type -pc_type -pc_factor_mat_solver_package'
+      petsc_options_value = 'gmres lu superlu_dist'
+    [../]
+    [./preferred]
+      type = SMP
+      full = true
+      petsc_options_iname = '-pc_type -pc_factor_mat_solver_package'
+      petsc_options_value = ' lu       mumps'
+    [../]
 []
 [Executioner]
   type = Transient
-  start_time = 0.0
-  end_time = '${endTime}'
-  solve_type = PJFNK
-  automatic_scaling = true
-  l_max_its = 50
-  petsc_options_iname = '-ksp_gmres_restart -pc_type -pc_ilu_levels'
-  petsc_options_value = '30             ilu     20'
-
+  solve_type = NEWTON
+  end_time = ${endTime}
+  dtmin = 1
+  dtmax = ${dt_max}
+  l_tol      = 1e-4 #1e-12 #NOTE, Lynn had 1e-4, which is possibly OK, but i want to work the linear solver harder to potentially reduce nonlinear iterations.  ALSO NOTE: if the linear solver gives a crappy inversion then it is quite likely that MOOSE will be forced to evaluate water props at crazy (P, T), and hence fail.
+  l_max_its  = 200 #1000 # NOTE, Lynn had 200, but i am trying to work the linear solver harder - also, ilu will probably need more iterations than lu
+  nl_max_its = 50 #200
+  #nl_abs_tol = 1e-4# #1e-6 # NOTE Lynn had nl_abs_tol = 1e-4 , but i want to make sure i get quality convergence while i'm checking over the input file
+  nl_rel_tol = 1e-5 #1E-8 # NOTE, Lynn had 1e-5 , but i want to make sure i get quality convergence while i'm checking over the input file
+  automatic_scaling =true # false
+  # NOTE line_search = none
+  # NOTE reuse_preconditioner=true
+  # [Predictor]
+  #   type = SimplePredictor
+  #   scale = 0.5
+  # []
   [TimeStepper]
     type = FunctionDT
-    dt = dts
+    function = dts
+    min_dt = 10
+    interpolate = true
+    growth_factor = 3
   []
 []
+
+##############################################################
 [Outputs]
-  exodus = true
-  perf_graph = true
   csv = true
-  #max_output_frequency = 5000
+  [exo]
+    type = Exodus
+    sync_times = '1 2 3 4 5
+    5.00E+04	1.00E+05	1.50E+05	2.00E+05	2.50E+05	3.00E+05
+    3.50E+05	4.00E+05	4.50E+05	5.00E+05	5.50E+05	6.00E+05	6.50E+05
+    7.00E+05	7.50E+05	8.00E+05	8.50E+05	9.00E+05	9.50E+05	1.00E+06
+    1.05E+06	1.10E+06	1.15E+06	1.20E+06	1.25E+06	1.30E+06	1.35E+06
+    1.40E+06	1.45E+06	1.50E+06	1.55E+06	1.60E+06	1.65E+06	1.70E+06
+    1.75E+06	1.80E+06	1.85E+06	1.90E+06	1.95E+06	2.00E+06	2.05E+06
+    2.10E+06	2.15E+06	2.20E+06	2.25E+06	2.30E+06	2.35E+06	2.40E+06
+    2.45E+06	2.50E+06	2.55E+06	2.60E+06	2.65E+06	2.70E+06	2.75E+06
+    2.80E+06	2.85E+06	2.90E+06	2.95E+06	3.00E+06	3.05E+06	3.10E+06
+    3.15E+06	3.20E+06	3.25E+06	3.30E+06	3.35E+06	3.40E+06	3.45E+06
+    3.50E+06	3.55E+06	3.60E+06	3.65E+06	3.70E+06	3.75E+06	3.80E+06
+    3.85E+06	3.90E+06	3.95E+06	4.00E+06	4.05E+06	4.10E+06	4.15E+06
+    4.20E+06	4.25E+06	4.30E+06	4.35E+06	4.40E+06	4.45E+06	4.50E+06
+    4.55E+06	4.60E+06	4.65E+06	4.70E+06	4.75E+06	4.80E+06	4.85E+06
+    4.90E+06	4.95E+06	5.00E+06	5.05E+06	5.10E+06	5.15E+06	5.20E+06
+    5.25E+06	5.30E+06	5.35E+06	5.40E+06	5.45E+06	5.50E+06	5.55E+06
+    5.60E+06	5.65E+06	5.70E+06	5.75E+06	5.80E+06	5.85E+06	5.90E+06
+    5.95E+06	6.00E+06	6.05E+06	6.10E+06	6.15E+06	6.20E+06	6.25E+06
+    6.30E+06	6.35E+06	6.40E+06	6.45E+06	6.50E+06	6.55E+06	6.60E+06
+    6.65E+06	6.70E+06	6.75E+06	6.80E+06	6.85E+06	6.90E+06	6.95E+06
+    7.00E+06	7.05E+06	7.10E+06	7.15E+06	7.20E+06	7.25E+06	7.30E+06
+    7.35E+06	7.40E+06	7.45E+06	7.50E+06	7.55E+06	7.60E+06	7.65E+06
+    7.70E+06	7.75E+06 8e6 9e6
+    10e6 11e6 12e6 13e6 14e6 15e6 16e6 17e6 18e6 19e6
+    20e6 21e6 22e6 23e6 24e6 25e6 26e6 27e6 28e6 29e6
+    30e6 31e6 32e6 33e6 34e6 35e6 36e6 37e6 38e6 39e6
+    40e6'
+    sync_only = true
+  []
 []
 
+# NOTE - following is useful for checking scaling
+# NOTE [Debug]
+# NOTE   show_var_residual_norms = true
+# NOTE []
