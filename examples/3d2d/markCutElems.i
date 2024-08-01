@@ -1,4 +1,4 @@
-refinement_level = 7
+refinement_level = 3
 
 #-------------------Regular mesh limits
 # Mesh Limits:

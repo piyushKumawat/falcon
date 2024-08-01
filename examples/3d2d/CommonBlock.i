@@ -1,9 +1,8 @@
 # Units K,m,Pa,Kg,s
 # Cold water injection into one side of the fracture network, and production from the other side
-frac_permeability = 1e-12
-endTime = 40e6  # 462 days
-dt_max = 10000 # NOTE, Lynn had 50000, but i want to check convergence for more agressive cases
-dt_max2 = 50000 # this is the timestep size after 90 days
+endTime = 20000  # 462 days
+dt_max = 100 # NOTE, Lynn had 50000, but i want to check convergence for more agressive cases
+dt_max2 = 100 # this is the timestep size after 90 days
 # injection_temp = 323.15
 injection_rate = 10 #kg/s
 
@@ -109,21 +108,24 @@ injection_rate = 10 #kg/s
   PorousFlowDictator = dictator
 []
 
-[PorousFlowFullySaturated]
-  coupling_type = Hydro
-  porepressure = porepressure
-  dictator_name = dictator
-  fp = true_water
-  stabilization = full
-[]
+# [PorousFlowFullySaturated]
+#   coupling_type = Hydro
+#   porepressure = porepressure
+#   dictator_name = dictator
+#   fp = true_water
+#   stabilization = full
+# []
+
 [FluidProperties]
-  [true_water]
-    type = Water97FluidProperties
+  [the_simple_fluid]
+    type = SimpleFluidProperties
+    bulk_modulus = 2E8
+    viscosity = 1.0E-3
+    density0 = 850.0
   []
-  # [tabulated_water]
-  #   type = TabulatedFluidProperties
-  #   fp = true_water
-  #   fluid_property_file = tabulated_fluid_properties_v2.csv
+
+  # [true_water]
+  #   type = Water97FluidProperties
   # []
 []
 
@@ -140,6 +142,46 @@ injection_rate = 10 #kg/s
     variable = porepressure
   []
 []
+
+[AuxVariables]
+  [Pdiff]
+    initial_condition = 0
+  []
+  [density]
+    order = CONSTANT
+    family = MONOMIAL
+  []
+  [viscosity]
+    order = CONSTANT
+    family = MONOMIAL
+  []
+[]
+
+
+[AuxKernels]
+  [Pdiff]
+    type = ParsedAux
+    use_xyzt = true
+    variable = Pdiff
+    coupled_variables = 'porepressure'
+    expression = 'porepressure-(1.6025e7-9810*(z-1150))'
+    execute_on = TIMESTEP_END
+  []
+  [density]
+    type = MaterialRealAux
+    variable = density
+    property = PorousFlow_fluid_phase_density_qp0
+    execute_on = TIMESTEP_END
+  []
+  [viscosity]
+    type = MaterialRealAux
+    variable = viscosity
+    property = PorousFlow_viscosity_qp0
+    execute_on = TIMESTEP_END
+  []
+[]
+
+
 ##############################################################
 [BCs]
 # NOTE: these BCs prevent water and heat from exiting or entering the model
@@ -160,35 +202,7 @@ injection_rate = 10 #kg/s
 #  []
 []
 
-##############################################################
-[Materials]
-  [biot_modulus]
-    type = PorousFlowConstantBiotModulus
-    biot_coefficient = 0.47
-    solid_bulk_compliance = 2e-7
-    fluid_bulk_modulus = 1e7
-  []
-  [porosity_matrix]
-    type = PorousFlowPorosity
-    porosity_zero = 0.001
-    block = 0
-  []
-  [./permeability_matrix]
-    type = PorousFlowPermeabilityConst
-    permeability = '1e-18 0 0 0 1e-18 0 0 0 1e-18'
-    block = 0
-  [../]
-  [porosity_fracture]
-    type = PorousFlowPorosityConst
-    porosity = 0.01
-    block = 1
-  []
-  [permeability_fracture]
-    type = PorousFlowPermeabilityConst
-    block = 1
-    permeability = '${frac_permeability} 0 0 0 ${frac_permeability} 0 0 0 ${frac_permeability}'
-  []
-[]
+
 
 ##########################################################
 [Functions]
@@ -213,7 +227,6 @@ injection_rate = 10 #kg/s
     type = ParsedFunction
     value = '1.6025e7-8500*(z-1150) + 1e6' # NOTE, Lynn used + 1e6, but i want to be more agressive
   []
-
 []
 
 ###########################################################
@@ -332,43 +345,43 @@ injection_rate = 10 #kg/s
 []
 ###########################################################
 [Preconditioning]
-  active = hypre # NOTE - perhaps ilu is going to be necessary in the full problem?
   # NOTE: the following is how i would use hypre - probably worth an experiment on the full problem
-    [./hypre]
-      type = SMP
-      full = true
-      petsc_options = '-ksp_diagonal_scale -ksp_diagonal_scale_fix'
-      petsc_options_iname = '-pc_type -pc_hypre_type'
-      petsc_options_value = ' hypre    boomeramg'
-    [../]
-    [./asm_ilu]  #uses less memory
-      type = SMP
-      full = true
-      petsc_options = '-ksp_diagonal_scale -ksp_diagonal_scale_fix'
-      petsc_options_iname = '-ksp_type -ksp_grmres_restart -pc_type -sub_pc_type -sub_pc_factor_shift_type -pc_asm_overlap'
-      petsc_options_value = 'gmres 30 asm ilu NONZERO 2'
-    [../]
-    [./asm_lu]  #uses less memory
-      type = SMP
-      full = true
-      petsc_options = '-ksp_diagonal_scale -ksp_diagonal_scale_fix'
-      petsc_options_iname = '-ksp_type -ksp_grmres_restart -pc_type -sub_pc_type -sub_pc_factor_shift_type -pc_asm_overlap'
-      petsc_options_value = 'gmres 30 asm lu NONZERO 2'
-    [../]
-    [./superlu]
-      type = SMP
-      full = true
-      petsc_options = '-ksp_diagonal_scale -ksp_diagonal_scale_fix'
-      petsc_options_iname = '-ksp_type -pc_type -pc_factor_mat_solver_package'
-      petsc_options_value = 'gmres lu superlu_dist'
-    [../]
-    [./preferred]
-      type = SMP
-      full = true
-      petsc_options_iname = '-pc_type -pc_factor_mat_solver_package'
-      petsc_options_value = ' lu       mumps'
-    [../]
+  [hypre]
+    type = SMP
+    full = true
+    petsc_options = '-ksp_diagonal_scale -ksp_diagonal_scale_fix'
+    petsc_options_iname = '-pc_type -pc_hypre_type'
+    petsc_options_value = ' hypre    boomeramg'
+  []
+  [asm_ilu] #uses less memory
+    type = SMP
+    full = true
+    petsc_options = '-ksp_diagonal_scale -ksp_diagonal_scale_fix'
+    petsc_options_iname = '-ksp_type -ksp_grmres_restart -pc_type -sub_pc_type -sub_pc_factor_shift_type -pc_asm_overlap'
+    petsc_options_value = 'gmres 30 asm ilu NONZERO 2'
+  []
+  [asm_lu] #uses less memory
+    type = SMP
+    full = true
+    petsc_options = '-ksp_diagonal_scale -ksp_diagonal_scale_fix'
+    petsc_options_iname = '-ksp_type -ksp_grmres_restart -pc_type -sub_pc_type -sub_pc_factor_shift_type -pc_asm_overlap'
+    petsc_options_value = 'gmres 30 asm lu NONZERO 2'
+  []
+  [superlu]
+    type = SMP
+    full = true
+    petsc_options = '-ksp_diagonal_scale -ksp_diagonal_scale_fix'
+    petsc_options_iname = '-ksp_type -pc_type -pc_factor_mat_solver_package'
+    petsc_options_value = 'gmres lu superlu_dist'
+  []
+  [preferred]
+    type = SMP
+    full = true
+    petsc_options_iname = '-pc_type -pc_factor_mat_solver_package'
+    petsc_options_value = ' lu       mumps'
+  []
 []
+
 [Executioner]
   type = Transient
   solve_type = NEWTON
@@ -397,41 +410,41 @@ injection_rate = 10 #kg/s
 []
 
 ##############################################################
-[Outputs]
-  csv = true
-  [exo]
-    type = Exodus
-    # sync_times = '1 2 3 4 5
-    # 5.00E+04	1.00E+05	1.50E+05	2.00E+05	2.50E+05	3.00E+05
-    # 3.50E+05	4.00E+05	4.50E+05	5.00E+05	5.50E+05	6.00E+05	6.50E+05
-    # 7.00E+05	7.50E+05	8.00E+05	8.50E+05	9.00E+05	9.50E+05	1.00E+06
-    # 1.05E+06	1.10E+06	1.15E+06	1.20E+06	1.25E+06	1.30E+06	1.35E+06
-    # 1.40E+06	1.45E+06	1.50E+06	1.55E+06	1.60E+06	1.65E+06	1.70E+06
-    # 1.75E+06	1.80E+06	1.85E+06	1.90E+06	1.95E+06	2.00E+06	2.05E+06
-    # 2.10E+06	2.15E+06	2.20E+06	2.25E+06	2.30E+06	2.35E+06	2.40E+06
-    # 2.45E+06	2.50E+06	2.55E+06	2.60E+06	2.65E+06	2.70E+06	2.75E+06
-    # 2.80E+06	2.85E+06	2.90E+06	2.95E+06	3.00E+06	3.05E+06	3.10E+06
-    # 3.15E+06	3.20E+06	3.25E+06	3.30E+06	3.35E+06	3.40E+06	3.45E+06
-    # 3.50E+06	3.55E+06	3.60E+06	3.65E+06	3.70E+06	3.75E+06	3.80E+06
-    # 3.85E+06	3.90E+06	3.95E+06	4.00E+06	4.05E+06	4.10E+06	4.15E+06
-    # 4.20E+06	4.25E+06	4.30E+06	4.35E+06	4.40E+06	4.45E+06	4.50E+06
-    # 4.55E+06	4.60E+06	4.65E+06	4.70E+06	4.75E+06	4.80E+06	4.85E+06
-    # 4.90E+06	4.95E+06	5.00E+06	5.05E+06	5.10E+06	5.15E+06	5.20E+06
-    # 5.25E+06	5.30E+06	5.35E+06	5.40E+06	5.45E+06	5.50E+06	5.55E+06
-    # 5.60E+06	5.65E+06	5.70E+06	5.75E+06	5.80E+06	5.85E+06	5.90E+06
-    # 5.95E+06	6.00E+06	6.05E+06	6.10E+06	6.15E+06	6.20E+06	6.25E+06
-    # 6.30E+06	6.35E+06	6.40E+06	6.45E+06	6.50E+06	6.55E+06	6.60E+06
-    # 6.65E+06	6.70E+06	6.75E+06	6.80E+06	6.85E+06	6.90E+06	6.95E+06
-    # 7.00E+06	7.05E+06	7.10E+06	7.15E+06	7.20E+06	7.25E+06	7.30E+06
-    # 7.35E+06	7.40E+06	7.45E+06	7.50E+06	7.55E+06	7.60E+06	7.65E+06
-    # 7.70E+06	7.75E+06 8e6 9e6
-    # 10e6 11e6 12e6 13e6 14e6 15e6 16e6 17e6 18e6 19e6
-    # 20e6 21e6 22e6 23e6 24e6 25e6 26e6 27e6 28e6 29e6
-    # 30e6 31e6 32e6 33e6 34e6 35e6 36e6 37e6 38e6 39e6
-    # 40e6'
-    # sync_only = true
-  []
-[]
+# [Outputs]
+#   csv = true
+#   [exo]
+#     type = Exodus
+#     sync_times = '1 2 3 4 5
+#     5.00E+04	1.00E+05	1.50E+05	2.00E+05	2.50E+05	3.00E+05
+#     3.50E+05	4.00E+05	4.50E+05	5.00E+05	5.50E+05	6.00E+05	6.50E+05
+#     7.00E+05	7.50E+05	8.00E+05	8.50E+05	9.00E+05	9.50E+05	1.00E+06
+#     1.05E+06	1.10E+06	1.15E+06	1.20E+06	1.25E+06	1.30E+06	1.35E+06
+#     1.40E+06	1.45E+06	1.50E+06	1.55E+06	1.60E+06	1.65E+06	1.70E+06
+#     1.75E+06	1.80E+06	1.85E+06	1.90E+06	1.95E+06	2.00E+06	2.05E+06
+#     2.10E+06	2.15E+06	2.20E+06	2.25E+06	2.30E+06	2.35E+06	2.40E+06
+#     2.45E+06	2.50E+06	2.55E+06	2.60E+06	2.65E+06	2.70E+06	2.75E+06
+#     2.80E+06	2.85E+06	2.90E+06	2.95E+06	3.00E+06	3.05E+06	3.10E+06
+#     3.15E+06	3.20E+06	3.25E+06	3.30E+06	3.35E+06	3.40E+06	3.45E+06
+#     3.50E+06	3.55E+06	3.60E+06	3.65E+06	3.70E+06	3.75E+06	3.80E+06
+#     3.85E+06	3.90E+06	3.95E+06	4.00E+06	4.05E+06	4.10E+06	4.15E+06
+#     4.20E+06	4.25E+06	4.30E+06	4.35E+06	4.40E+06	4.45E+06	4.50E+06
+#     4.55E+06	4.60E+06	4.65E+06	4.70E+06	4.75E+06	4.80E+06	4.85E+06
+#     4.90E+06	4.95E+06	5.00E+06	5.05E+06	5.10E+06	5.15E+06	5.20E+06
+#     5.25E+06	5.30E+06	5.35E+06	5.40E+06	5.45E+06	5.50E+06	5.55E+06
+#     5.60E+06	5.65E+06	5.70E+06	5.75E+06	5.80E+06	5.85E+06	5.90E+06
+#     5.95E+06	6.00E+06	6.05E+06	6.10E+06	6.15E+06	6.20E+06	6.25E+06
+#     6.30E+06	6.35E+06	6.40E+06	6.45E+06	6.50E+06	6.55E+06	6.60E+06
+#     6.65E+06	6.70E+06	6.75E+06	6.80E+06	6.85E+06	6.90E+06	6.95E+06
+#     7.00E+06	7.05E+06	7.10E+06	7.15E+06	7.20E+06	7.25E+06	7.30E+06
+#     7.35E+06	7.40E+06	7.45E+06	7.50E+06	7.55E+06	7.60E+06	7.65E+06
+#     7.70E+06	7.75E+06 8e6 9e6
+#     10e6 11e6 12e6 13e6 14e6 15e6 16e6 17e6 18e6 19e6
+#     20e6 21e6 22e6 23e6 24e6 25e6 26e6 27e6 28e6 29e6
+#     30e6 31e6 32e6 33e6 34e6 35e6 36e6 37e6 38e6 39e6
+#     40e6'
+#     sync_only = true
+#   []
+# []
 
 # NOTE - following is useful for checking scaling
 # NOTE [Debug]
