@@ -5,7 +5,7 @@
 # k=(Transmsivity/element_length)*viscosity/(density*gravity)
 # k = (Transmisivity/2)*1e-3/(1000*9.81)
 # k=Transmisvity*5.09683996e-8
-ic_frac_perm=1e-13
+ic_frac_perm=1e-14
 ic_matrix_perm=1e-16
 ic_frac_poro=0.0033
 ic_matrix_poro=0.001
@@ -115,7 +115,7 @@ rock_gravitational_density = 0
   type = ParsedAux
   variable = lagged_perm
   coupled_variables = 'permeability crack_max_strain1'
-  expression = 'permeability *(1 + ${three_s_over_a0} * max(0, crack_max_strain1))'
+  expression = 'permeability *(1 + ${three_s_over_a0} * max(0, crack_max_strain1)* max(0, crack_max_strain1))'
   execute_on = NONLINEAR
 []
 

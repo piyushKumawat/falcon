@@ -12,91 +12,6 @@ injection_rate = 10 #kg/s
 #          uniform mesh and output it an exodus file of it.
 #
 # seacas explore output
-# p3_aniso_post_stim_out.e
-# Mesh Limits:
-# Min X =  1.911310000E+03, Max X =  2.511310000E+03, Range =  6.000000000E+02
-# Min Y =  1.662310000E+03, Max Y =  2.262310000E+03, Range =  6.000000000E+02
-# Min Z = -1.150000000E+03, Max Z = -5.500000000E+02, Range =  6.000000000E+02
-
-# [Mesh]
-#   [gmg]
-#     type = GeneratedMeshGenerator
-#     dim = 3
-#     nx = 60
-#     ny = 60
-#     nz = 60
-#     xmin = 0
-#     xmax =600
-#     ymin = 0
-#     ymax =600
-#     zmin = 0
-#     zmax =600
-#   []
-#   [dummy]
-#     type = SubdomainBoundingBoxGenerator
-#     input = 'gmg'
-#     block_id = 1
-#     bottom_left = '0 0 0'
-#     top_right = '100 100 100'
-#     location = outside
-#   []
-# []
-
-# ##############################################################
-# [AuxVariables]
-#   [cut]
-#     order = CONSTANT
-#     family = MONOMIAL
-#   []
-#   [indicator]
-#     order = CONSTANT
-#     family = MONOMIAL
-#   []
-#   [marker]
-#     order = CONSTANT
-#     family = MONOMIAL
-#   []
-# []
-
-# [AuxKernels]
-#   [cut]
-#     type = MarkCutElems
-#     mesh_file = MS_DFN_Local_Coords.exo
-#     variable = cut
-#   []
-# []
-
-# [UserObjects]
-#   [DFN]
-#     type = CoupledVarThresholdElementSubdomainModifier
-#     coupled_var = 'cut'
-#     criterion_type = ABOVE
-#     threshold = 0.5
-#     subdomain_id = 1
-#     complement_subdomain_id = 0
-#     execute_on = 'TIMESTEP_END'
-#   []
-# []
-
-# [Adaptivity]
-#   marker = marker
-#   max_h_level = 2
-#   stop_time = 7
-#   [Indicators]
-#     [indicator]
-#       type = ValueJumpIndicator
-#       variable = cut
-#     []
-#   []
-#   [Markers]
-#     [marker]
-#       type = ErrorFractionMarker
-#       indicator = indicator
-#       coarsen = 0.1
-#       refine = 0.9
-#     []
-#   []
-# []
 [Mesh]
   [fmg]
     type = FileMeshGenerator
@@ -408,50 +323,8 @@ injection_rate = 10 #kg/s
   [TimeStepper]
     type = FunctionDT
     function = dts
-    min_dt = 10
+    min_dt = 1
     interpolate = true
     growth_factor = 3
   []
 []
-
-##############################################################
-# [Outputs]
-#   csv = true
-#   [exo]
-#     type = Exodus
-#     sync_times = '1 2 3 4 5
-#     5.00E+04	1.00E+05	1.50E+05	2.00E+05	2.50E+05	3.00E+05
-#     3.50E+05	4.00E+05	4.50E+05	5.00E+05	5.50E+05	6.00E+05	6.50E+05
-#     7.00E+05	7.50E+05	8.00E+05	8.50E+05	9.00E+05	9.50E+05	1.00E+06
-#     1.05E+06	1.10E+06	1.15E+06	1.20E+06	1.25E+06	1.30E+06	1.35E+06
-#     1.40E+06	1.45E+06	1.50E+06	1.55E+06	1.60E+06	1.65E+06	1.70E+06
-#     1.75E+06	1.80E+06	1.85E+06	1.90E+06	1.95E+06	2.00E+06	2.05E+06
-#     2.10E+06	2.15E+06	2.20E+06	2.25E+06	2.30E+06	2.35E+06	2.40E+06
-#     2.45E+06	2.50E+06	2.55E+06	2.60E+06	2.65E+06	2.70E+06	2.75E+06
-#     2.80E+06	2.85E+06	2.90E+06	2.95E+06	3.00E+06	3.05E+06	3.10E+06
-#     3.15E+06	3.20E+06	3.25E+06	3.30E+06	3.35E+06	3.40E+06	3.45E+06
-#     3.50E+06	3.55E+06	3.60E+06	3.65E+06	3.70E+06	3.75E+06	3.80E+06
-#     3.85E+06	3.90E+06	3.95E+06	4.00E+06	4.05E+06	4.10E+06	4.15E+06
-#     4.20E+06	4.25E+06	4.30E+06	4.35E+06	4.40E+06	4.45E+06	4.50E+06
-#     4.55E+06	4.60E+06	4.65E+06	4.70E+06	4.75E+06	4.80E+06	4.85E+06
-#     4.90E+06	4.95E+06	5.00E+06	5.05E+06	5.10E+06	5.15E+06	5.20E+06
-#     5.25E+06	5.30E+06	5.35E+06	5.40E+06	5.45E+06	5.50E+06	5.55E+06
-#     5.60E+06	5.65E+06	5.70E+06	5.75E+06	5.80E+06	5.85E+06	5.90E+06
-#     5.95E+06	6.00E+06	6.05E+06	6.10E+06	6.15E+06	6.20E+06	6.25E+06
-#     6.30E+06	6.35E+06	6.40E+06	6.45E+06	6.50E+06	6.55E+06	6.60E+06
-#     6.65E+06	6.70E+06	6.75E+06	6.80E+06	6.85E+06	6.90E+06	6.95E+06
-#     7.00E+06	7.05E+06	7.10E+06	7.15E+06	7.20E+06	7.25E+06	7.30E+06
-#     7.35E+06	7.40E+06	7.45E+06	7.50E+06	7.55E+06	7.60E+06	7.65E+06
-#     7.70E+06	7.75E+06 8e6 9e6
-#     10e6 11e6 12e6 13e6 14e6 15e6 16e6 17e6 18e6 19e6
-#     20e6 21e6 22e6 23e6 24e6 25e6 26e6 27e6 28e6 29e6
-#     30e6 31e6 32e6 33e6 34e6 35e6 36e6 37e6 38e6 39e6
-#     40e6'
-#     sync_only = true
-#   []
-# []
-
-# NOTE - following is useful for checking scaling
-# NOTE [Debug]
-# NOTE   show_var_residual_norms = true
-# NOTE []
