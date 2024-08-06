@@ -306,7 +306,7 @@ injection_rate = 10 #kg/s
   type = Transient
   solve_type = NEWTON
   end_time = ${endTime}
-  dtmin = 1
+  dt = 1
   dtmax = ${dt_max}
   l_tol      = 1e-4 #1e-12 #NOTE, Lynn had 1e-4, which is possibly OK, but i want to work the linear solver harder to potentially reduce nonlinear iterations.  ALSO NOTE: if the linear solver gives a crappy inversion then it is quite likely that MOOSE will be forced to evaluate water props at crazy (P, T), and hence fail.
   l_max_its  = 200 #1000 # NOTE, Lynn had 200, but i am trying to work the linear solver harder - also, ilu will probably need more iterations than lu
@@ -323,8 +323,8 @@ injection_rate = 10 #kg/s
   [TimeStepper]
     type = FunctionDT
     function = dts
-    min_dt = 1
+    min_dt = 0.001
     interpolate = true
-    growth_factor = 3
+    growth_factor = 2 #changed from 3
   []
 []

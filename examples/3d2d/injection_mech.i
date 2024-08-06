@@ -42,7 +42,7 @@ rock_gravitational_density = 0
 # mesh, reading initial conditions from mesh, sources, sinks, functiosn, postprocessors
 !include CommonBlock.i
 [Preconditioning]
-  active =hypre   #hypre #superlu
+  active =superlu   #hypre #superlu
 []
 
 ######-------------- Initially scale fields -----------------#########
@@ -393,7 +393,7 @@ rock_gravitational_density = 0
   []
   [elastic_stress]
     type = ComputeSmearedCrackingStress
-    cracking_stress = 1.2e7
+    cracking_stress = 1.2e7 
     softening_models = abrupt_softening
     max_stress_correction = 0
     shear_retention_factor = 0.1
@@ -403,7 +403,7 @@ rock_gravitational_density = 0
   []
   [abrupt_softening]
     type = AbruptSoftening
-    residual_stress = 0.05
+    residual_stress = 0.05 #increase (check units)
   []
 
   [undrained_density]
