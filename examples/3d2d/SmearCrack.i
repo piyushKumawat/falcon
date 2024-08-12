@@ -1,6 +1,6 @@
 # Units K,m,Pa,Kg,s
 # Cold water injection into one side of the fracture network, and production from the other side
-endTime = 200000  
+endTime = 20000 
 dt_max = 100 
 dt_max2 = 100 # this is the timestep size after 90 days
 injection_rate = 10 #kg/s
@@ -175,18 +175,18 @@ rock_gravitational_density = 0
     cracked_elasticity_type = FULL
     output_properties = true
     perform_finite_strain_rotations=false
-    block = '0'
+    # block = '0'
   []
-  [elastic_stress_fracture]
-    type = ComputeSmearedCrackingStress
-    cracking_stress = 0
-    softening_models = abrupt_softening
-    max_stress_correction = 0
-    shear_retention_factor = 0.1
-    cracked_elasticity_type = FULL
-    output_properties = true
-    perform_finite_strain_rotations=false
-    block = '1'
+  # [elastic_stress_fracture]
+  #   type = ComputeSmearedCrackingStress
+  #   cracking_stress = 0
+  #   softening_models = abrupt_softening
+  #   max_stress_correction = 0
+  #   shear_retention_factor = 0.1
+  #   cracked_elasticity_type = FULL
+  #   output_properties = true
+  #   perform_finite_strain_rotations=false
+  #   block = '1'
   []
   [abrupt_softening]
     type = AbruptSoftening
@@ -448,7 +448,7 @@ rock_gravitational_density = 0
     type = PiecewiseLinear
     xy_data = '
     0    0.0
-    50000 ${injection_rate}'
+    2000 ${injection_rate}'
   []
 # NOTE: because this is used in BCs, it should be reasonably physically correct,
 # otherwise the BCs will be withdrawing or injecting heat-energy inappropriately
