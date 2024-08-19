@@ -187,7 +187,7 @@ rock_gravitational_density = 0
   #   output_properties = true
   #   perform_finite_strain_rotations=false
   #   block = '1'
-  []
+  # []
   [abrupt_softening]
     type = AbruptSoftening
     residual_stress = 0.05 #increase (check units)
@@ -531,36 +531,6 @@ rock_gravitational_density = 0
 #   []
 []
 
-[Executioner]
-  type = Transient
-  solve_type = NEWTON
-  end_time = ${endTime}
-  dt = 1
-  dtmax = ${dt_max}
-  l_tol      = 1e-4 #1e-12 #NOTE, Lynn had 1e-4, which is possibly OK, but i want to work the linear solver harder to potentially reduce nonlinear iterations.  ALSO NOTE: if the linear solver gives a crappy inversion then it is quite likely that MOOSE will be forced to evaluate water props at crazy (P, T), and hence fail.
-  l_max_its  = 200 #1000 # NOTE, Lynn had 200, but i am trying to work the linear solver harder - also, ilu will probably need more iterations than lu
-  nl_max_its = 50 #200
-  #nl_abs_tol = 1e-4# #1e-6 # NOTE Lynn had nl_abs_tol = 1e-4 , but i want to make sure i get quality convergence while i'm checking over the input file
-  nl_rel_tol = 1e-5 #1E-8 # NOTE, Lynn had 1e-5 , but i want to make sure i get quality convergence while i'm checking over the input file
-  automatic_scaling =true # false
-  # NOTE line_search = none
-  # NOTE reuse_preconditioner=true
-  # [Predictor]
-  #   type = SimplePredictor
-  #   scale = 0.5
-  # []
-  [TimeStepper]
-    type = FunctionDT
-    function = dts
-    min_dt = 0.0001
-    interpolate = true
-    growth_factor = 3 #changed from 3
-  []
-[]
-
-# Units K,m,Pa,Kg,s
-
-
 [Postprocessors]
   [three_s_over_a0]
     type = ConstantPostprocessor
@@ -665,6 +635,36 @@ rock_gravitational_density = 0
     type = NumDOFs
   []
 []
+
+[Executioner]
+  type = Transient
+  solve_type = NEWTON
+  end_time = ${endTime}
+  dt = 1
+  dtmax = ${dt_max}
+  l_tol      = 1e-4 #1e-12 #NOTE, Lynn had 1e-4, which is possibly OK, but i want to work the linear solver harder to potentially reduce nonlinear iterations.  ALSO NOTE: if the linear solver gives a crappy inversion then it is quite likely that MOOSE will be forced to evaluate water props at crazy (P, T), and hence fail.
+  l_max_its  = 200 #1000 # NOTE, Lynn had 200, but i am trying to work the linear solver harder - also, ilu will probably need more iterations than lu
+  nl_max_its = 50 #200
+  #nl_abs_tol = 1e-4# #1e-6 # NOTE Lynn had nl_abs_tol = 1e-4 , but i want to make sure i get quality convergence while i'm checking over the input file
+  nl_rel_tol = 1e-5 #1E-8 # NOTE, Lynn had 1e-5 , but i want to make sure i get quality convergence while i'm checking over the input file
+  automatic_scaling =true # false
+  # NOTE line_search = none
+  # NOTE reuse_preconditioner=true
+  # [Predictor]
+  #   type = SimplePredictor
+  #   scale = 0.5
+  # []
+  [TimeStepper]
+    type = FunctionDT
+    function = dts
+    min_dt = 0.0001
+    interpolate = true
+    growth_factor = 3 #changed from 3
+  []
+[]
+
+# Units K,m,Pa,Kg,s
+
 
 
 

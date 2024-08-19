@@ -18,7 +18,7 @@ refinement_level = 3
   [dummy]
     type = SubdomainBoundingBoxGenerator
     input = 'gmg'
-    block_id = 1x
+    block_id = 1
     bottom_left = '0 0 0'
     top_right = '100 100 100'
     location = outside
@@ -44,7 +44,7 @@ refinement_level = 3
 [AuxKernels]
   [cut]
     type = MarkCutElems
-    mesh_file = MS_DFN_Local_Coords.exo
+    mesh_file = 3fracs.e
     variable = cut
   []
 []
