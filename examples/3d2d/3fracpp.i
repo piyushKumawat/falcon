@@ -4,9 +4,9 @@ frac_permeability = 1e-12
 endTime = 40e6  # 462 days
 dt_max = 10000 # NOTE
 dt_max2 = 50000 # this is the timestep size after 90 days
-injection_rate1 = 10 #kg/s
-injection_rate2 = 10 #kg/s
-injection_rate3 = 10 #kg/s
+injection_rate1 = 2 #kg/s
+injection_rate2 = 2 #kg/s
+injection_rate3 = 2 #kg/s
 
 
 [Mesh]
@@ -29,13 +29,19 @@ injection_rate3 = 10 #kg/s
   coupling_type = Hydro
   porepressure = porepressure
   dictator_name = dictator
-  fp = true_water
+  fp = the_simple_fluid
   stabilization = full
 []
 [FluidProperties]
-  [true_water]
-    type = Water97FluidProperties
+  [the_simple_fluid]
+    type = SimpleFluidProperties
+    bulk_modulus = 2E9
+    viscosity = 1.0E-3
+    density0 = 1000.0
   []
+  # [true_water]
+  #   type = Water97FluidProperties
+  # []
   # [tabulated_water]
   #   type = TabulatedFluidProperties
   #   fp = true_water
@@ -335,7 +341,7 @@ injection_rate3 = 10 #kg/s
   [TimeStepper]
     type = FunctionDT
     function = dts
-    min_dt = 10
+    min_dt = 0.001
     interpolate = true
     growth_factor = 3
   []
