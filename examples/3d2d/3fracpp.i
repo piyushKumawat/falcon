@@ -4,7 +4,7 @@ frac_permeability = 1e-12
 endTime = 40e6  # 462 days
 dt_max = 10000 # NOTE
 dt_max2 = 50000 # this is the timestep size after 90 days
-injection_rate1 = 2 #kg/s
+injection_rate1 = 20 #kg/s
 injection_rate2 = 2 #kg/s
 injection_rate3 = 2 #kg/s
 
