@@ -2,12 +2,12 @@
 # Cold water injection into one side of the fracture network, and production from the other side
 frac_permeability = 1e-12
 endTime = 40e6  # 462 days
-dt_max = 10000 # NOTE
-dt_max2 = 50000 # this is the timestep size after 90 days
-injection_rate1 = 20 #kg/s
-injection_rate2 = 2 #kg/s
-injection_rate3 = 2 #kg/s
-
+dt_max = 10 # NOTE
+dt_max2 = 10 # this is the timestep size after 90 days
+# injection_rate1 = 5 #kg/s
+# injection_rate2 = 5 #kg/s
+# injection_rate3 = 5 #kg/s
+# ft = 20000.0
 
 [Mesh]
   [fmg]
@@ -29,23 +29,25 @@ injection_rate3 = 2 #kg/s
   coupling_type = Hydro
   porepressure = porepressure
   dictator_name = dictator
-  fp = the_simple_fluid
+  fp = true_water
   stabilization = full
 []
 [FluidProperties]
-  [the_simple_fluid]
-    type = SimpleFluidProperties
-    bulk_modulus = 2E9
-    viscosity = 1.0E-3
-    density0 = 1000.0
-  []
-  # [true_water]
-  #   type = Water97FluidProperties
+  # [the_simple_fluid]
+  #   type = SimpleFluidProperties
+  #   bulk_modulus = 2E9
+  #   viscosity = 1.0E-3
+  #   density0 = 1000.0
   # []
+  [true_water]
+    type = Water97FluidProperties
+  []
   # [tabulated_water]
-  #   type = TabulatedFluidProperties
+  #   type = TabulatedBicubicFluidProperties
   #   fp = true_water
-  #   fluid_property_file = tabulated_fluid_properties_v2.csv
+  #   fluid_property_file = ext_fluid_properties2.csv
+  #   temperature_min = 280 #added new
+  #   temperature_max = 600 #added new
   # []
 []
 
@@ -117,26 +119,40 @@ injection_rate3 = 2 #kg/s
   [dts]
     type = PiecewiseLinear
     x = '0   5.0  6.0  50000      2592000    5184000'
-    y = '1.0 1.0  1000 ${dt_max}  ${dt_max} ${dt_max2}'
+    y = '1.0 1.0  10 ${dt_max}  ${dt_max} ${dt_max2}'
   []
   [mass_flux_in1]
     type = PiecewiseLinear
-    xy_data = '
-    0    0.0
-    500 ${injection_rate1}'
+    x='0  50000   51917  51946 52556  52576   54933   54963  60661  60673.0  67669.0  67673.0'
+    y='5  0.833   0.833  0     0      0.833   0.833   1.67   1.67   2.5      2.5      0'
   []
   [mass_flux_in2]
     type = PiecewiseLinear
-    xy_data = '
-    0    0.0
-    500 ${injection_rate2}'
+    x='0  50000   51917  51946 52556  52576   54933   54963  60661  60673.0  67669.0  67673.0'
+    y='5  0.833   0.833  0     0      0.833   0.833   1.67   1.67   2.5      2.5      0'
   []
   [mass_flux_in3]
     type = PiecewiseLinear
-    xy_data = '
-    0    0.0
-    500 ${injection_rate3}'
+    x='0  50000   51917  51946 52556  52576   54933   54963  60661  60673.0  67669.0  67673.0'
+    y='5  0.833   0.833  0     0      0.833   0.833   1.67   1.67   2.5      2.5      0'
   []
+
+  # [mass_flux_in1]
+  #   type = PiecewiseLinear
+  #   x='0  0.0 +${ft}   1917.0+${ft}   1946.0+${ft} 2556.0+${ft}  2576.0+${ft}   4933.0+${ft}   4963.0+${ft}   10661.0+${ft}   10673.0+${ft}  17669.0+${ft}  17673.0+${ft}'
+  #   y='5  0.833        0.833          0            0             0.833          0.833          1.67           1.67            2.5            2.5            0'
+  # []
+  # [mass_flux_in2]
+  #   type = PiecewiseLinear
+  #   x='0  0.0 +${ft}   1917.0+${ft}   1946.0+${ft} 2556.0+${ft}  2576.0+${ft}   4933.0+${ft}   4963.0+${ft}   10661.0+${ft}   10673.0+${ft}  17669.0+${ft}  17673.0+${ft}'
+  #   y='5  0.833        0.833          0            0             0.833          0.833          1.67           1.67            2.5            2.5            0'
+  # []
+  # [mass_flux_in3]
+  #   type = PiecewiseLinear
+  #   x='0  0.0 +${ft}   1917.0+${ft}   1946.0+${ft} 2556.0+${ft}  2576.0+${ft}   4933.0+${ft}   4963.0+${ft}   10661.0+${ft}   10673.0+${ft}  17669.0+${ft}  17673.0+${ft}'
+  #   y='5  0.833        0.833          0            0             0.833          0.833          1.67           1.67            2.5            2.5            0'
+  # []
+
 # NOTE: because this is used in BCs, it should be reasonably physically correct,
 # otherwise the BCs will be withdrawing or injecting heat-energy inappropriately
   [insitu_pp]
@@ -147,7 +163,6 @@ injection_rate3 = 2 #kg/s
     type = ParsedFunction
     value = '1.6025e7-8500*(z-1150) + 1e6' # NOTE, Lynn used + 1e6, but i want to be more agressive
   []
-
 []
 
 ###########################################################
@@ -163,19 +178,19 @@ injection_rate3 = 2 #kg/s
     type = PorousFlowPointSourceFromPostprocessor
     variable = porepressure
     mass_flux = mass_flux_src1
-    point = '407.045 263.554 209.113'
+    point = '406.25 263.468 209.48'
   []
   [source2]
     type = PorousFlowPointSourceFromPostprocessor
     variable = porepressure
     mass_flux = mass_flux_src2
-    point = '353.726 257.807 233.901'
+    point = '351.25 257.54 235.05'
   []
   [source3]
     type = PorousFlowPointSourceFromPostprocessor
     variable = porepressure
     mass_flux = mass_flux_src3
-    point = '202.805 241.542 304.066'
+    point = '203 241.56 303.97'
   []
   [withdraw_fluid]
     type = PorousFlowPeacemanBorehole
@@ -192,24 +207,34 @@ injection_rate3 = 2 #kg/s
 []
 
 [Postprocessors]
-  [p_in]
+  [p_in1]
     type = PointValue
-    point = '407.045 263.554 209.113'
+    point = '406.25 263.468 209.48'
+    variable =porepressure 
+  []
+  [p_in2]
+    type = PointValue
+    point = '351.25 257.54 235.05'
+    variable =porepressure
+  []
+  [p_in3]
+    type = PointValue
+    point = '203 241.56 303.97'
     variable =porepressure 
   []
   [p_out1]
     type = PointValue
-    point = '201.3873 241.389 404.7255'
+    point = '203 241.56 395.453'
     variable =porepressure 
   []
   [p_out2]
     type = PointValue
-    point = '352.308 257.655 334.561'
+    point = '351.25 257.54 326.493'
     variable =porepressure
   []
   [p_out3]
     type = PointValue
-    point = '405.626 263.401 309.771'
+    point = '406.25 263.468 300.923'
     variable =porepressure
   []
   [pmin_ts]

@@ -140,6 +140,22 @@ injection_rate = 10 #kg/s
 []
 []
 
+[AuxVariables]
+  [Pdiff]
+  []
+[]
+
+[AuxKernels]
+  [Pdiff]
+    type = ParsedAux
+    use_xyzt=true
+    variable = Pdiff
+    coupled_variables = 'porepressure'
+    expression = 'porepressure-(1.6025e7-8500*(z-1150))'
+    execute_on = TIMESTEP_END
+  []
+[]
+
 [ICs]
   [P]
     type = FunctionIC
@@ -237,6 +253,7 @@ injection_rate = 10 #kg/s
     variable = porepressure
     mass_flux = mass_flux_src
     point = '404.616 258.1823 221.3399'
+    # point = '202.805 241.542 304.066'
   []
   [withdraw_fluid]
     type = PorousFlowPeacemanBorehole
@@ -256,6 +273,7 @@ injection_rate = 10 #kg/s
   [p_in]
     type = PointValue
     point = '404.616 258.1823 221.3399'
+    # point = '202.805 241.542 304.066'
     variable =porepressure 
   []
   [p_out1]
@@ -345,8 +363,11 @@ injection_rate = 10 #kg/s
       type = SMP
       full = true
       petsc_options = '-ksp_diagonal_scale -ksp_diagonal_scale_fix'
-      petsc_options_iname = '-pc_type -pc_hypre_type'
-      petsc_options_value = ' hypre    boomeramg'
+  petsc_options_iname = '-pc_type -pc_hypre_type -ksp_gmres_restart -pc_hypre_boomeramg_strong_threshold'
+  petsc_options_value = 'hypre boomeramg 31 0.7'
+
+      #petsc_options_iname = '-pc_type -pc_hypre_type  pc_hypre_boomeramg_strong_threshold'
+      #petsc_options_value = ' hypre    boomeramg 0.7'
     [../]
     [./asm_ilu]  #uses less memory
       type = SMP
