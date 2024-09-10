@@ -2,7 +2,7 @@
 # Cold water injection into one side of the fracture network, and production from the other side
 frac_permeability = 1e-12
 endTime = 40e6  # 462 days
-dt_max = 10 # NOTE
+dt_max = 100 # NOTE
 dt_max2 = 10 # this is the timestep size after 90 days
 # injection_rate1 = 5 #kg/s
 # injection_rate2 = 5 #kg/s
@@ -118,23 +118,23 @@ dt_max2 = 10 # this is the timestep size after 90 days
 [Functions]
   [dts]
     type = PiecewiseLinear
-    x = '0   5.0  6.0  50000      2592000    5184000'
-    y = '1.0 1.0  10 ${dt_max}  ${dt_max} ${dt_max2}'
+    x = '0   5.0  6.0 5000 6900 22673'
+    y = '1.0 1.0  100 100  10    ${dt_max2}'
   []
   [mass_flux_in1]
     type = PiecewiseLinear
-    x='0  50000   51917  51946 52556  52576   54933   54963  60661  60673.0  67669.0  67673.0'
-    y='5  0.833   0.833  0     0      0.833   0.833   1.67   1.67   2.5      2.5      0'
+    x='0     5000   6917   6946  7556   7576   10933   10963   15661   15673.0  22669.0  22673.0'
+    y='3.53  2.21   2.21   0     0      2.21   2.21    4.4167  4.4167  6.624    6.624    0'
   []
   [mass_flux_in2]
     type = PiecewiseLinear
-    x='0  50000   51917  51946 52556  52576   54933   54963  60661  60673.0  67669.0  67673.0'
-    y='5  0.833   0.833  0     0      0.833   0.833   1.67   1.67   2.5      2.5      0'
+    x='0     5000   6917   6946  7556   7576   10933   10963   15661   15673.0  22669.0  22673.0'
+    y='3.53  2.21   2.21   0     0      2.21   2.21    4.4167  4.4167  6.624    6.624    0'
   []
   [mass_flux_in3]
     type = PiecewiseLinear
-    x='0  50000   51917  51946 52556  52576   54933   54963  60661  60673.0  67669.0  67673.0'
-    y='5  0.833   0.833  0     0      0.833   0.833   1.67   1.67   2.5      2.5      0'
+    x='0     5000   6917   6946  7556   7576   10933   10963   15661   15673.0  22669.0  22673.0'
+    y='3.53  2.21   2.21   0     0      2.21   2.21    4.4167  4.4167  6.624    6.624    0'
   []
 
   # [mass_flux_in1]
