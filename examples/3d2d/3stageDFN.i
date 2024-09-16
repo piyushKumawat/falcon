@@ -1,8 +1,8 @@
 # Units K,m,Pa,Kg,s
 # Cold water injection into one side of the fracture network, and production from the other side
-frac_permeability = 1e-12
-endTime = 1763  
-dt_max = 10 # NOTE
+frac_permeability = 1e-13
+endTime = 17673  
+dt_max = 100 # NOTE
 dt_max2 = 10 # this is the timestep size after 90 days
 # injection_rate1 = 5 #kg/s
 # injection_rate2 = 5 #kg/s
@@ -118,8 +118,8 @@ dt_max2 = 10 # this is the timestep size after 90 days
 [Functions]
   [dts]
     type = PiecewiseLinear
-    x = '0   5.0  6.0 5000 6900 5184000'
-    y = '1.0 1.0  100 100  5    ${dt_max2}'
+    x = '0   5.0  6.0 1500 1600 17673'
+    y = '1.0 1.0  100 100  10   ${dt_max2}'
   []
   [mass_flux_in1]
     type = PiecewiseLinear

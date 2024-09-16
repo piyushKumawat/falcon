@@ -1,7 +1,7 @@
 # Units K,m,Pa,Kg,s
 # Cold water injection into one side of the fracture network, and production from the other side
 frac_permeability = 1e-12
-endTime = 1763  # 462 days
+endTime = 17673  # 462 days
 dt_max = 100 # NOTE
 dt_max2 = 10 # this is the timestep size after 90 days
 # injection_rate1 = 5 #kg/s
