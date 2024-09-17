@@ -1,6 +1,6 @@
 # Units K,m,Pa,Kg,s
 # Cold water injection into one side of the fracture network, and production from the other side
-frac_permeability = 1e-13
+# frac_permeability = 1e-13
 endTime = 17673  # 462 days
 dt_max = 100 # NOTE
 dt_max2 = 10 # this is the timestep size after 90 days
@@ -63,6 +63,11 @@ dt_max2 = 10 # this is the timestep size after 90 days
     function = insitu_pp
     variable = porepressure
   []
+  [permz]
+    type = FunctionIC
+    function = permz
+    variable = permzz
+  []
 []
 ##############################################################
 [BCs]
@@ -108,13 +113,36 @@ dt_max2 = 10 # this is the timestep size after 90 days
     block = 1
   []
   [permeability_fracture]
-    type = PorousFlowPermeabilityConst
+    type = PorousFlowPermeabilityConstFromVar
+    perm_xx = permzz
+    perm_yy = permzz
+    perm_zz = permzz
     block = 1
-    permeability = '${frac_permeability} 0 0 0 ${frac_permeability} 0 0 0 ${frac_permeability}'
   []
 []
 
+# [AuxKernels]
+#   [perm]
+#     type = ParsedAux
+#     variable=perm
+#     coupled_variables = 'perm_md'
+#     expression = '5*(1e-14)+(5.5278*(1e-16))*coord(z)'
+#     execute_on= initial
+#   []
+# []
+
+[AuxVariables]
+  [permzz]
+    order = CONSTANT
+    family = MONOMIAL
+  []
+[]
+
+
 ##########################################################
+
+
+
 [Functions]
   [dts]
     type = PiecewiseLinear
@@ -162,6 +190,10 @@ dt_max2 = 10 # this is the timestep size after 90 days
   [insitu_pp_borehole]
     type = ParsedFunction
     value = '1.6025e7-8500*(z-1150) + 1e6' # NOTE, Lynn used + 1e6, but i want to be more agressive
+  []
+  [permz]
+    type = ParsedFunction
+    expression = '5*1e-14+(5.5278*1e-16)*t'
   []
 []
 
