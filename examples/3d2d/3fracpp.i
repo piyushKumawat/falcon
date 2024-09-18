@@ -294,6 +294,11 @@ dt_max2 = 10 # this is the timestep size after 90 days
     function = mass_flux_in3
     execute_on = 'initial timestep_end'
   []
+  [permiadt]
+    type = FunctionValuePostprocessor
+    function = permz
+    execute_on = 'initial timestep_end'
+  []
   [fluid_report]
     type = PorousFlowPlotQuantity
     uo = borehole_fluid_outflow_mass
