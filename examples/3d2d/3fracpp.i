@@ -193,7 +193,7 @@ dt_max2 = 10 # this is the timestep size after 90 days
   []
   [permz]
     type = ParsedFunction
-    expression = '1e-14+(1.6665*1e-11)*z'
+    expression = '1e-18+(1.6665*1e-15)*z'
   []
 []
 
@@ -283,20 +283,21 @@ dt_max2 = 10 # this is the timestep size after 90 days
     type = PointValue
     point = '203 241.56 303.97'
     variable = permzz
+  []
   [perm1_out]
     type = PointValue
     point = '406.25 263.468 300.923'
-    variable =porepressure 
+    variable =permzz 
   []
   [perm2_out]
     type = PointValue
     point = '351.25 257.54 326.493'
-    variable =porepressure
+    variable =permzz
   []
   [perm3_out]
     type = PointValue
     point = '203 241.56 395.453'
-    variable =porepressure
+    variable =permzz
   []
   [pmin_ts]
     type = NodalExtremeValue
