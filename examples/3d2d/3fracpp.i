@@ -53,8 +53,8 @@ dt_max2 = 10 # this is the timestep size after 90 days
 
 ##############################################################
 [Variables]
-[porepressure]
-[]
+  [porepressure]
+  []
 []
 
 [ICs]
@@ -269,6 +269,21 @@ dt_max2 = 10 # this is the timestep size after 90 days
     point = '406.25 263.468 300.923'
     variable =porepressure
   []
+  [perm1_in]
+    type = PointValue
+    point = '406.25 263.468 209.48'
+    variable = permzz
+  []
+  [perm2_in]
+    type = PointValue
+    point = '351.25 257.54 235.05'
+    variable = permzz
+  []
+  [perm3_in]
+    type = PointValue
+    point = '406.25 263.468 300.923'
+    variable = permzz
+  []
   [pmin_ts]
     type = NodalExtremeValue
     variable = porepressure
@@ -294,11 +309,11 @@ dt_max2 = 10 # this is the timestep size after 90 days
     function = mass_flux_in3
     execute_on = 'initial timestep_end'
   []
-  [permiadt]
-    type = FunctionValuePostprocessor
-    function = permz
-    execute_on = 'initial timestep_end'
-  []
+  # [permiadt]
+  #   type = FunctionValuePostprocessor
+  #   function = permz
+  #   execute_on = 'initial timestep_end'
+  # []
   [fluid_report]
     type = PorousFlowPlotQuantity
     uo = borehole_fluid_outflow_mass
