@@ -12,7 +12,7 @@ dt_max2 = 10 # this is the timestep size after 90 days
 [Mesh]
   [fmg]
     type = FileMeshGenerator
-    file = '3fracr1.xdr'
+    file = '4frac.xdr'
   []
 []
 ##############################################################
@@ -151,20 +151,24 @@ dt_max2 = 10 # this is the timestep size after 90 days
   []
   [mass_flux_in1]
     type = PiecewiseLinear
-    x='0     1917   1946 2556  2576   4933   4963   10661   10673  17669   17673'
-    y='2.207 2.207  0    0     2.207  2.207  4.425  4.425   6.625  6.625    0'
+    x='0      1917    1946    2556  2576   4933    4963     10661    10673   17669   17673'
+    y='1.656  1.656   0       0     1.656  1.656   3.3125   3.125    4.968   4.968   0'
   []
   [mass_flux_in2]
     type = PiecewiseLinear
-    x='0     1917   1946 2556  2576   4933   4963   10661   10673  17669    17673'
-    y='2.207 2.207  0    0     2.207  2.207  4.425  4.425   6.625  6.625    0'
+    x='0      1917    1946    2556  2576   4933    4963     10661    10673   17669   17673'
+    y='1.656  1.656   0       0     1.656  1.656   3.3125   3.125    4.968   4.968   0'
   []
   [mass_flux_in3]
     type = PiecewiseLinear
-    x='0     1917   1946 2556  2576   4933   4963   10661   10673  17669   17673'
-    y='2.207 2.207  0    0     2.207  2.207  4.425  4.425   6.625  6.625   0'
+    x='0      1917    1946    2556  2576   4933    4963     10661    10673   17669   17673'
+    y='1.656  1.656   0       0     1.656  1.656   3.3125   3.125    4.968   4.968   0'
   []
-
+  [mass_flux_in4]
+    type = PiecewiseLinear
+    x='0      1917    1946    2556  2576   4933    4963     10661    10673   17669   17673'
+    y='1.656  1.656   0       0     1.656  1.656   3.3125   3.125    4.968   4.968   0'
+  []
   # [mass_flux_in1]
   #   type = PiecewiseLinear
   #   x='0  0.0 +${ft}   1917.0+${ft}   1946.0+${ft} 2556.0+${ft}  2576.0+${ft}   4933.0+${ft}   4963.0+${ft}   10661.0+${ft}   10673.0+${ft}  17669.0+${ft}  17673.0+${ft}'
@@ -216,20 +220,26 @@ dt_max2 = 10 # this is the timestep size after 90 days
     type = PorousFlowPointSourceFromPostprocessor
     variable = porepressure
     mass_flux = mass_flux_src2
-    point = '351.25 257.54 235.05'
+    point = '360 258.48 230.98'
   []
   [source3]
     type = PorousFlowPointSourceFromPostprocessor
     variable = porepressure
     mass_flux = mass_flux_src3
-    point = '203 241.56 303.97'
+    point = '320 254.17 249.58'
+  []
+  [source4]
+    type = PorousFlowPointSourceFromPostprocessor
+    variable = porepressure
+    mass_flux = mass_flux_src3
+    point = '202.91 241.56 304.0133'
   []
   [withdraw_fluid]
     type = PorousFlowPeacemanBorehole
     variable = porepressure
     bottom_p_or_t = insitu_pp_borehole
     SumQuantityUO = borehole_fluid_outflow_mass
-    point_file = production_points_3frac.csv
+    point_file = production_points_4frac.csv
     function_of = pressure
     fluid_phase = 0
     unit_weight = '0 0 -0.85e4' # NOTE: Lynn had -1e4, but 0.85e4 is equal to the insitu_pp
@@ -246,27 +256,37 @@ dt_max2 = 10 # this is the timestep size after 90 days
   []
   [p_in2]
     type = PointValue
-    point = '351.25 257.54 235.05'
+    point = '360 258.484 230.98'
     variable =porepressure
   []
   [p_in3]
     type = PointValue
-    point = '203 241.56 303.97'
+    point = '320 254.17 249.58'
+    variable =porepressure 
+  []
+  [p_in4]
+    type = PointValue
+    point = '202.91 241.55 304.013'
     variable =porepressure 
   []
   [p_out1]
     type = PointValue
-    point = '406.25 263.468 309.483'
+    point = '202.91 241.55 404.013'
     variable =porepressure 
   []
   [p_out2]
     type = PointValue
-    point = '351.25 257.54 335.053'
+    point = '320 254.172 349.58'
     variable =porepressure
   []
   [p_out3]
     type = PointValue
-    point = '203 241.56 404.01'
+    point = '360 258.484 330.985'
+    variable =porepressure
+  []
+  [p_out4]
+    type = PointValue
+    point = '406.25 263.468 309.48'
     variable =porepressure
   []
   [perm1_in]
@@ -322,6 +342,11 @@ dt_max2 = 10 # this is the timestep size after 90 days
   [mass_flux_src3]
     type = FunctionValuePostprocessor
     function = mass_flux_in3
+    execute_on = 'initial timestep_end'
+  []
+  [mass_flux_src4]
+    type = FunctionValuePostprocessor
+    function = mass_flux_in4
     execute_on = 'initial timestep_end'
   []
   # [permiadt]

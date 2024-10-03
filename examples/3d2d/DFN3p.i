@@ -1,7 +1,7 @@
 # Units K,m,Pa,Kg,s
 # Cold water injection into one side of the fracture network, and production from the other side
-# frac_permeability = 1e-13
-endTime = 17673  # 462 days
+frac_permeability = 1e-12
+endTime = 17673  
 dt_max = 100 # NOTE
 dt_max2 = 10 # this is the timestep size after 90 days
 # injection_rate1 = 5 #kg/s
@@ -12,7 +12,7 @@ dt_max2 = 10 # this is the timestep size after 90 days
 [Mesh]
   [fmg]
     type = FileMeshGenerator
-    file = '3fracr1.xdr'
+    file = 'forge123.xdr'
   []
 []
 ##############################################################
@@ -53,8 +53,8 @@ dt_max2 = 10 # this is the timestep size after 90 days
 
 ##############################################################
 [Variables]
-  [porepressure]
-  []
+[porepressure]
+[]
 []
 
 [ICs]
@@ -62,11 +62,6 @@ dt_max2 = 10 # this is the timestep size after 90 days
     type = FunctionIC
     function = insitu_pp
     variable = porepressure
-  []
-  [permz]
-    type = FunctionIC
-    function = permz
-    variable = permzz
   []
 []
 ##############################################################
@@ -113,36 +108,13 @@ dt_max2 = 10 # this is the timestep size after 90 days
     block = 1
   []
   [permeability_fracture]
-    type = PorousFlowPermeabilityConstFromVar
-    perm_xx = permzz
-    perm_yy = permzz
-    perm_zz = permzz
+    type = PorousFlowPermeabilityConst
     block = 1
+    permeability = '${frac_permeability} 0 0 0 ${frac_permeability} 0 0 0 ${frac_permeability}'
   []
 []
-
-# [AuxKernels]
-#   [perm]
-#     type = ParsedAux
-#     variable=perm
-#     coupled_variables = 'perm_md'
-#     expression = '5*(1e-14)+(5.5278*(1e-16))*coord(z)'
-#     execute_on= initial
-#   []
-# []
-
-[AuxVariables]
-  [permzz]
-    order = CONSTANT
-    family = MONOMIAL
-  []
-[]
-
 
 ##########################################################
-
-
-
 [Functions]
   [dts]
     type = PiecewiseLinear
@@ -152,14 +124,14 @@ dt_max2 = 10 # this is the timestep size after 90 days
   [mass_flux_in1]
     type = PiecewiseLinear
     x='0     1917   1946 2556  2576   4933   4963   10661   10673  17669   17673'
-    y='2.207 2.207  0    0     2.207  2.207  4.425  4.425   6.625  6.625    0'
-  []
-  [mass_flux_in2]
-    type = PiecewiseLinear
-    x='0     1917   1946 2556  2576   4933   4963   10661   10673  17669    17673'
-    y='2.207 2.207  0    0     2.207  2.207  4.425  4.425   6.625  6.625    0'
+    y='2.207 2.207  0    0     2.207  2.207  4.425  4.425   6.625  6.625   0'
   []
   [mass_flux_in3]
+    type = PiecewiseLinear
+    x='0     1917   1946 2556  2576   4933   4963   10661   10673  17669   17673'
+    y='2.207 2.207  0    0     2.207  2.207  4.425  4.425   6.625  6.625   0'
+  []
+  [mass_flux_in4]
     type = PiecewiseLinear
     x='0     1917   1946 2556  2576   4933   4963   10661   10673  17669   17673'
     y='2.207 2.207  0    0     2.207  2.207  4.425  4.425   6.625  6.625   0'
@@ -191,10 +163,6 @@ dt_max2 = 10 # this is the timestep size after 90 days
     type = ParsedFunction
     value = '1.6025e7-8500*(z-1150) + 1e6' # NOTE, Lynn used + 1e6, but i want to be more agressive
   []
-  [permz]
-    type = ParsedFunction
-    expression = '1e-12+(1e-18)*z'
-  []
 []
 
 ###########################################################
@@ -210,26 +178,26 @@ dt_max2 = 10 # this is the timestep size after 90 days
     type = PorousFlowPointSourceFromPostprocessor
     variable = porepressure
     mass_flux = mass_flux_src1
-    point = '406.25 263.468 209.48'
-  []
-  [source2]
-    type = PorousFlowPointSourceFromPostprocessor
-    variable = porepressure
-    mass_flux = mass_flux_src2
-    point = '351.25 257.54 235.05'
+    point = '200 241.5522778643 304.0223232716'
   []
   [source3]
     type = PorousFlowPointSourceFromPostprocessor
     variable = porepressure
     mass_flux = mass_flux_src3
-    point = '203 241.56 303.97'
+    point = '311.762 253.047 253.35'
+  []
+  [source4]
+    type = PorousFlowPointSourceFromPostprocessor
+    variable = porepressure
+    mass_flux = mass_flux_src4
+    point = '406 263 209.5'
   []
   [withdraw_fluid]
     type = PorousFlowPeacemanBorehole
     variable = porepressure
     bottom_p_or_t = insitu_pp_borehole
     SumQuantityUO = borehole_fluid_outflow_mass
-    point_file = production_points_3frac.csv
+    point_file = production_z100.csv
     function_of = pressure
     fluid_phase = 0
     unit_weight = '0 0 -0.85e4' # NOTE: Lynn had -1e4, but 0.85e4 is equal to the insitu_pp
@@ -241,63 +209,33 @@ dt_max2 = 10 # this is the timestep size after 90 days
 [Postprocessors]
   [p_in1]
     type = PointValue
-    point = '406.25 263.468 209.48'
+    point = '200.9000000000 241.5522778643 304.0223232716'
     variable =porepressure 
-  []
-  [p_in2]
-    type = PointValue
-    point = '351.25 257.54 235.05'
-    variable =porepressure
   []
   [p_in3]
     type = PointValue
-    point = '203 241.56 303.97'
+    point = '311.762 253.047 253.35'
+    variable =porepressure 
+  []
+  [p_in4]
+    type = PointValue
+    point = '406 263 209.5'
     variable =porepressure 
   []
   [p_out1]
     type = PointValue
-    point = '406.25 263.468 309.483'
+    point = '2.026917e+02 2.411225e+02 4.079207e+02'
     variable =porepressure 
-  []
-  [p_out2]
-    type = PointValue
-    point = '351.25 257.54 335.053'
-    variable =porepressure
   []
   [p_out3]
     type = PointValue
-    point = '203 241.56 404.01'
+    point = '3.685889e+02 2.551385e+02 3.367876e+02'
     variable =porepressure
   []
-  [perm1_in]
+  [p_out4]
     type = PointValue
-    point = '406.25 263.468 209.48'
-    variable = permzz
-  []
-  [perm2_in]
-    type = PointValue
-    point = '351.25 257.54 235.05'
-    variable = permzz
-  []
-  [perm3_in]
-    type = PointValue
-    point = '203 241.56 303.97'
-    variable = permzz
-  []
-  [perm1_out]
-    type = PointValue
-    point = '406.25 263.468 309.483'
-    variable =permzz 
-  []
-  [perm2_out]
-    type = PointValue
-    point = '351.25 257.54 335.053'
-    variable =permzz
-  []
-  [perm3_out]
-    type = PointValue
-    point = '203 241.56 404.01'
-    variable =permzz
+    point = '4.082343e+02 2.584880e+02 3.197885e+02'
+    variable =porepressure
   []
   [pmin_ts]
     type = NodalExtremeValue
@@ -314,21 +252,16 @@ dt_max2 = 10 # this is the timestep size after 90 days
       function = mass_flux_in1
       execute_on = 'initial timestep_end'
   []
-  [mass_flux_src2]
-    type = FunctionValuePostprocessor
-    function = mass_flux_in2
-    execute_on = 'initial timestep_end'
-  []
   [mass_flux_src3]
     type = FunctionValuePostprocessor
     function = mass_flux_in3
     execute_on = 'initial timestep_end'
   []
-  # [permiadt]
-  #   type = FunctionValuePostprocessor
-  #   function = permz
-  #   execute_on = 'initial timestep_end'
-  # []
+  [mass_flux_src4]
+    type = FunctionValuePostprocessor
+    function = mass_flux_in4
+    execute_on = 'initial timestep_end'
+  []
   [fluid_report]
     type = PorousFlowPlotQuantity
     uo = borehole_fluid_outflow_mass
@@ -433,7 +366,7 @@ dt_max2 = 10 # this is the timestep size after 90 days
   [TimeStepper]
     type = FunctionDT
     function = dts
-    min_dt = 0.001
+    min_dt = 0.00001
     interpolate = true
     growth_factor = 3
   []
