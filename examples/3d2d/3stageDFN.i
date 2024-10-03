@@ -1,6 +1,6 @@
 # Units K,m,Pa,Kg,s
 # Cold water injection into one side of the fracture network, and production from the other side
-frac_permeability = 1e-13
+frac_permeability = 1e-12
 endTime = 17673  
 dt_max = 100 # NOTE
 dt_max2 = 10 # this is the timestep size after 90 days
@@ -209,7 +209,7 @@ dt_max2 = 10 # this is the timestep size after 90 days
     variable = porepressure
     bottom_p_or_t = insitu_pp_borehole
     SumQuantityUO = borehole_fluid_outflow_mass
-    point_file = production_z100.csv
+    point_file = production_z100_3pts.csv
     function_of = pressure
     fluid_phase = 0
     unit_weight = '0 0 -0.85e4' # NOTE: Lynn had -1e4, but 0.85e4 is equal to the insitu_pp

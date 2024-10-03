@@ -193,7 +193,11 @@ dt_max2 = 10 # this is the timestep size after 90 days
   []
   [permz]
     type = ParsedFunction
+<<<<<<< HEAD
     expression = '1e-12+(1e-18)*z'
+=======
+    expression = '1e-12+1e-18*z'
+>>>>>>> 0fdcd4ecac0a48406412b1e2550932205a9c4fe6
   []
 []
 
