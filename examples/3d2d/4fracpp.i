@@ -256,12 +256,12 @@ dt_max2 = 10 # this is the timestep size after 90 days
   []
   [p_in2]
     type = PointValue
-    point = '360 258.484 230.98'
+    point = '379.00 260.25 214.743'
     variable =porepressure
   []
   [p_in3]
     type = PointValue
-    point = '320 254.17 249.58'
+    point = '351.55 257.569 228.659'
     variable =porepressure 
   []
   [p_in4]
@@ -276,12 +276,12 @@ dt_max2 = 10 # this is the timestep size after 90 days
   []
   [p_out2]
     type = PointValue
-    point = '320 254.172 349.58'
+    point = '351.55 257.569 328.659'
     variable =porepressure
   []
   [p_out3]
     type = PointValue
-    point = '360 258.484 330.985'
+    point = '379.00 260.25 314.743'
     variable =porepressure
   []
   [p_out4]
