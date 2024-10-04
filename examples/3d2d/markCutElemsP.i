@@ -44,7 +44,7 @@ refinement_level = 3
 [AuxKernels]
   [cut]
     type = MarkCutElems
-    mesh_file = 3frac_inc.e
+    mesh_file = 4fracs.e
     variable = cut
   []
 []
@@ -96,11 +96,11 @@ refinement_level = 3
 [Outputs]
   # csv = true
   [exo]
-    file_base = 'marker_r_0.2${refinement_level}/result_mark'
+    file_base = 'marker_4frac${refinement_level}/result_mark'
     type = Exodus
   []
   [xdr]
-    file_base = 'marker_r_0.2${refinement_level}/result_mark'
+    file_base = 'marker_4frac${refinement_level}/result_mark'
     type = XDR
   []
 []
