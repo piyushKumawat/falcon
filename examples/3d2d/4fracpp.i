@@ -220,13 +220,13 @@ dt_max2 = 10 # this is the timestep size after 90 days
     type = PorousFlowPointSourceFromPostprocessor
     variable = porepressure
     mass_flux = mass_flux_src2
-    point = '360 258.48 230.98'
+    point = '379.00 260.25 214.743'
   []
   [source3]
     type = PorousFlowPointSourceFromPostprocessor
     variable = porepressure
     mass_flux = mass_flux_src3
-    point = '320 254.17 249.58'
+    point = '351.55 257.569 228.659'
   []
   [source4]
     type = PorousFlowPointSourceFromPostprocessor
