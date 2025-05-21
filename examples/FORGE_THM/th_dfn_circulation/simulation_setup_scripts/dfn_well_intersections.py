@@ -13,7 +13,7 @@ print(
 # Read the CSV file
 output_dir = "../simulation_inputs/"
 df = pd.read_csv(
-    "../aleta_dfn/dfn_2025_03_14/Case_B_Fractures_Local.csv"
+    "../aleta_dfn/dfn_2025_03_14/27fracs.csv"
 )
 
 feetToMeters = 0.3048
@@ -41,7 +41,7 @@ for index, row in df.iterrows():
     radius = row["FractureRadius[m]"]
     trend_deg = row["Trend[deg]"]
     # FIXME  DON"T FORGET THIS THE +90!  Ask Aleta why
-    plunge_deg = row["Plunge[deg]"] + 90
+    plunge_deg = row["Plunge[deg]"] 
     strike_deg = row["Strike[deg]"]
 
     center = np.array(center)
