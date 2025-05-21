@@ -10,7 +10,7 @@
   [rename]
     type = RenameBlockGenerator
     input = fmg
-    old_block = '50'
+    old_block = '28'
     new_block = '1000'
   []
   [rmDuplicateSS]
