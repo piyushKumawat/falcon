@@ -1,9 +1,7 @@
-case_name="Case_B"
-mesh_size="10"
 [Mesh]
   [fmg]
     type = FileMeshGenerator
-    file = '${case_name}_Fractures_Local_${mesh_size}m.e'
+    file = 'Planar_Fractures.e'
   []
   add_subdomain_ids = '2000 3000' #2000=injection subdomain; 3000=production subdomain
 []
@@ -72,7 +70,7 @@ mesh_size="10"
 []
 
 [Outputs]
-  file_base=${case_name}_Fractures_Local_${mesh_size}m_marked
+  file_base=PlanarFractures_marked
   exodus = true
   execute_on = FINAL
 []

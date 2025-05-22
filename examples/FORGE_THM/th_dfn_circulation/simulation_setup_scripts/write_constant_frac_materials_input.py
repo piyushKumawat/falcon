@@ -18,13 +18,13 @@ precision = 10
 
 # Read the CSV file
 output_dir = "../simulation_inputs/"
-fname = "../aleta_dfn/dfn_2025_03_14/Case_B_Fractures_Local.csv"
+fname = "../aleta_dfn/dfn_2025_03_14/27fracs.csv"
 
 
 df = pd.read_csv(fname)
 
 # correct Aleta's plunge direction for Andys gmsh script
-df["Plunge[deg]"] = df["Plunge[deg]"] + 90  # FIXME  DON"T FORGET THIS!!!
+df["Plunge[deg]"] = df["Plunge[deg]"]  # FIXME  DON"T FORGET THIS!!!
 
 
 ############ WRITE DIRAC KERNELS

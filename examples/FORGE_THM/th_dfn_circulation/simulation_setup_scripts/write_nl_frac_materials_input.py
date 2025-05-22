@@ -18,7 +18,7 @@ precision = 10
 
 # Read the CSV file
 output_dir = "../simulation_inputs/"
-fname = "../aleta_dfn/dfn_2025_03_14/Case_B_Fractures_Local.csv"
+fname = "../aleta_dfn/dfn_2025_03_14/27fracs.csv"
 
 df = pd.read_csv(fname)
 
